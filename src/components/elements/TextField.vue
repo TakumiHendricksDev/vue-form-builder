@@ -6,6 +6,7 @@ defineProps<{
   label: string;
   placeholder?: string; // Optional placeholder
   modelValue?: string; // For two-way binding
+  name?: string;
 }>();
 
 // Emit an event for two-way binding

@@ -4,8 +4,8 @@ import ElementDisplay from './elements/ElementDisplay.vue';
 import SearchField from './elements/SearchField.vue';
 
 const fields = reactive([
-    { id: 1, label: "Text Field", type: "text" },
-    { id: 2, label: "Checkbox Field", type: "checkbox" },
+    { id: 1, label: "Text Field", type: "text", name: "text field"},
+    { id: 2, label: "Checkbox Field", type: "checkbox", name: "checkbox"},
 ]);
 
 const emit = defineEmits(['field-dropped']);
@@ -29,6 +29,7 @@ function onDragStart(event: DragEvent, field: any) {
     dragImg.textContent = field.label;
     dragImg.style.padding = '10px';
     dragImg.style.background = 'white';
+    dragImg.style.width = '500px';
     dragImg.style.border = '1px solid #ccc';
     document.body.appendChild(dragImg);
     event.dataTransfer.setDragImage(dragImg, 0, 0);
@@ -38,7 +39,7 @@ function onDragStart(event: DragEvent, field: any) {
 </script>
 
 <template>
-  <div class="bg-white flex flex-col gap-3 p-4">
+  <div class="bg-gray-100 flex flex-col gap-3 p-4">
     <SearchField placeholder="Type element name here"></SearchField>
 
     <div class="w-full flex flex-col gap-3">

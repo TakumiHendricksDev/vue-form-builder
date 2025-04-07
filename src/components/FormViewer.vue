@@ -7,6 +7,6 @@ defineProps<{
 
 <template>
   <div class="bg-gray-100 p-4">
-    <TextField label="Test" placeholder="This is a test..."></TextField>
+    <TextField label="Test" placeholder="This is a test..." name="text field"></TextField>
   </div>
 </template>

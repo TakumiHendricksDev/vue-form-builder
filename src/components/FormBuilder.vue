@@ -4,18 +4,20 @@ import ElementsPanel from './ElementsPanel.vue';
 import TextField from './elements/TextField.vue';
 import CheckboxField from './elements/CheckboxField.vue';
 import ElementConfigurationPanel from './ElementConfigurationPanel.vue';
+import deleteIcon from '../assets/noun-trashcan-6542955.svg'; // Import the SVG
 
 type FieldType = 'text' | 'checkbox';
-interface Field {
+export interface Field {
     id: number;
     type: FieldType;
     label: string;
+    name?: string;
     placeholder?: string;
 }
 
 const fields = reactive<Field[]>([]); // Fields dropped into the Form Viewer
 const dragOverIndex = ref(-1);
-const selectedField = ref(null)
+const selectedField = ref<Field | null>(null);
 
 const componentMap: Record<FieldType, Component> = {
   text: TextField,
@@ -24,6 +26,14 @@ const componentMap: Record<FieldType, Component> = {
 
 const formContainerRef = ref<HTMLElement | null>(null);
 
+function deleteField(index: number) {
+  if (index >= 0 && index < fields.length) {
+    const confirmDelete = window.confirm('Are you sure you want to delete this field?');
+    if (confirmDelete) {
+      fields.splice(index, 1);
+    }
+  }
+}
 // Add a new field at the end
 function addNewField(fieldType: FieldType, label: string) {
   const newId = fields.length > 0 ? Math.max(...fields.map(f => f.id)) + 1 : 1;
@@ -31,6 +41,7 @@ function addNewField(fieldType: FieldType, label: string) {
     id: newId,
     type: fieldType,
     label: label,
+    name: label,
     placeholder: label
   });
 }
@@ -42,6 +53,7 @@ function addNewFieldAt(fieldType: FieldType, label: string, index: number) {
     id: newId,
     type: fieldType,
     label: label,
+    name: label,
     placeholder: label
   };
   
@@ -89,18 +101,18 @@ function onReorderDragStart(event: DragEvent, field: Field, index: number) {
 // Handle dragging over the form area
 function onDragOver(event: DragEvent, index?: number) {
   event.preventDefault();
-  
+
   // Add visual styling to container
   if (formContainerRef.value) {
     formContainerRef.value.classList.add('dragover');
   }
-  
+
   // Update position indicator
   if (index !== undefined) {
     dragOverIndex.value = index;
   } else {
-    // If dragging over empty space, place at end
-    dragOverIndex.value = fields.length;
+    // If dragging over empty space or before the first item, set to 0
+    dragOverIndex.value = 0;
   }
 }
 
@@ -180,8 +192,12 @@ function onDrop(event: DragEvent) {
               :is="componentMap[field.type]" 
               :label="field.label"
               :placeholder="field.placeholder"
-              class="sortable-item"
+              :name="field.name"
+              class="sortable-item mb-2 "
             />
+            <button v-if="selectedField != null && selectedField.id === field.id" @click="deleteField(index)" class="border rounded border-gray-300 bg-gray-100 absolute right-0 top-0 flex items-center justify-center">
+              <img :src="deleteIcon" alt="Delete Icon" class="w-6 h-6" />
+            </button>
           </div>
           
           <!-- Position indicator after this item -->
@@ -199,7 +215,7 @@ function onDrop(event: DragEvent) {
     </div>
 
     <!-- Third Column -->
-    <ElementConfigurationPanel v-if="selectedField" :field="selectedField"></ElementConfigurationPanel>
+    <ElementConfigurationPanel class="col-span-2" v-if="selectedField" :field="selectedField"></ElementConfigurationPanel>
   </div>
 </template>
 
